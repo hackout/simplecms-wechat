@@ -1,0 +1,35 @@
+{
+    "name": "simplecms/wechat",
+    "description": "微信小程序",
+    "keywords": [
+        "laravel",
+        "wechat",
+        "simplecms"
+    ],
+    "version": "1.0.1",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "SimpleCMS\\Wechat\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "hackout",
+            "email": "hackout@vip.qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SimpleCMS\\Wechat\\WechatServiceProvider"
+            ],
+            "aliases": {
+                "MiniProgram": "SimpleCMS\\Wechat\\Facades\\MiniProgram"
+            }
+        }
+    }
+}
