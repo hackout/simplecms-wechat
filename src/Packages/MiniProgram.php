@@ -107,6 +107,10 @@ class MiniProgram
         return $result;
     }
 
+    /**
+     * 服务端监听
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     public function serverStart(): ResponseInterface
     {
         $server = $this->app->getServer();
@@ -153,5 +157,20 @@ class MiniProgram
             return event('plugin.wechat.message', event: 'voice', message: $message, closure: $next);
         });
         return $server->serve();
+    }
+
+    /**
+     * 小程序获取手机号码
+     * @param string $code
+     * @return array
+     */
+    public function getPhoneNumber(string $code): array
+    {
+        $client = $this->app->getClient();
+        $data = [
+            'code' => $code,
+        ];
+        $result = $client->postJson('wxa/business/getuserphonenumber', $data);
+        return $result->toArray(true);
     }
 }

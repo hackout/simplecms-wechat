@@ -3,15 +3,10 @@
 namespace SimpleCMS\Wechat\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\Rules\Enum;
 use Psr\Http\Message\ResponseInterface;
-use Illuminate\Support\Facades\Validator;
 use SimpleCMS\Framework\Attributes\ApiName;
-use SimpleCMS\Payment\Enums\ChannelEnum;
 use SimpleCMS\Wechat\Services\MiniProgramService;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use SimpleCMS\Payment\Services\Frontend\PaymentService;
 use SimpleCMS\Framework\Http\Controllers\BackendController as BaseController;
 
 /**
@@ -36,6 +31,7 @@ class MiniProgramController extends BaseController
         $result = $service->getOpenId($code);
         return $this->success($result);
     }
+
     /**
      * 微信小程序
      *
