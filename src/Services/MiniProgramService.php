@@ -1,12 +1,13 @@
 <?php
-
 namespace SimpleCMS\Wechat\Services;
 
 use Psr\Http\Message\ResponseInterface;
 use SimpleCMS\Wechat\Facades\MiniProgram;
+use SimpleCMS\Framework\Exceptions\SimpleException;
 
 class MiniProgramService
 {
+
     /**
      * 获取Code
      *
@@ -14,15 +15,14 @@ class MiniProgramService
      * @param  string     $code
      * @return array|null
      */
-    public function getOpenId(string $code): ?array
+    public function getOpenId(string $code): array|null
     {
+
         $session = MiniProgram::codeToSession($code);
-
-        if (! $session->has('openid') && $session->has('errmsg')) {
-            throw new \RuntimeException($session->get('errmsg'));
+        if (!$session->has('openid') && $session->has('errmsg')) {
+            throw new SimpleException($session->get('errmsg'));
         }
-
-        return event('plugin.wechat.code2session', $session->get('openid'));
+        return event("plugin.wechat.code2session", $session->get('openid'));
     }
 
     /**

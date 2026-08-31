@@ -1,17 +1,16 @@
 <?php
-
 namespace SimpleCMS\Wechat\Packages;
 
-use EasyWeChat\MiniApp\Application;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use EasyWeChat\MiniApp\Application;
 use Psr\Http\Message\ResponseInterface;
 
 class MiniProgram
 {
-    protected array $config;
+    protected $config;
 
-    protected Application $app;
+    protected $app;
 
     public function __construct()
     {
@@ -27,6 +26,7 @@ class MiniProgram
             'http' => [
                 'throw' => false,
                 'timeout' => 5.0,
+
                 'retry' => true,
             ],
         ];
@@ -47,8 +47,7 @@ class MiniProgram
         } catch (\Exception $e) {
             $response = json_decode(Str::afterLast($e->getMessage(), 'code2Session error:'), true);
         }
-
-        return collect($response ?? []);
+        return collect($response);
     }
 
     /**
@@ -68,8 +67,7 @@ class MiniProgram
         } catch (\Exception $e) {
             $response = json_decode(Str::afterLast($e->getMessage(), 'code2Session error:'), true);
         }
-
-        return collect($response ?? []);
+        return collect($response);
     }
 
     /**
@@ -92,9 +90,9 @@ class MiniProgram
                 'template_id' => $templateId,
                 'page' => 'pages/detail/detail?id=',
                 'data' => $this->convertDataForMessage($data),
-                'miniprogram_state' => $state,
-                'lang' => 'zh_CN',
-            ],
+                'miniprogram_state' => 'formal',
+                'lang' => 'zh_CN'
+            ]
         ]);
     }
 
@@ -103,10 +101,9 @@ class MiniProgram
         $result = [];
         foreach ($data as $key => $value) {
             $result[$key] = [
-                'value' => $value,
+                'value' => $value
             ];
         }
-
         return $result;
     }
 
@@ -118,51 +115,48 @@ class MiniProgram
     {
         $server = $this->app->getServer();
         $server->addEventListener('subscribe', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('subscribe', $message, $next);
+            return event('plugin.wechat.message', event: 'subscribe', message: $message, closure: $next);
         });
         $server->addEventListener('unsubscribe', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('unsubscribe', $message, $next);
+            return event('plugin.wechat.message', event: 'unsubscribe', message: $message, closure: $next);
         });
         $server->addEventListener('SCAN', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('SCAN', $message, $next);
+            return event('plugin.wechat.message', event: 'SCAN', message: $message, closure: $next);
         });
         $server->addEventListener('LOCATION', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('LOCATION', $message, $next);
+            return event('plugin.wechat.message', event: 'LOCATION', message: $message, closure: $next);
         });
         $server->addEventListener('CLICK', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('CLICK', $message, $next);
+            return event('plugin.wechat.message', event: 'CLICK', message: $message, closure: $next);
         });
         $server->addEventListener('VIEW', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('VIEW', $message, $next);
+            return event('plugin.wechat.message', event: 'VIEW', message: $message, closure: $next);
         });
         $server->addMessageListener('text', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('text', $message, $next);
+            return event('plugin.wechat.message', event: 'text', message: $message, closure: $next);
         });
         $server->addMessageListener('image', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('image', $message, $next);
+            return event('plugin.wechat.message', event: 'image', message: $message, closure: $next);
         });
         $server->addMessageListener('voice', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('voice', $message, $next);
+            return event('plugin.wechat.message', event: 'voice', message: $message, closure: $next);
         });
         $server->addMessageListener('video', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('video', $message, $next);
+            return event('plugin.wechat.message', event: 'video', message: $message, closure: $next);
         });
         $server->addMessageListener('shortvideo', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('shortvideo', $message, $next);
+            return event('plugin.wechat.message', event: 'shortvideo', message: $message, closure: $next);
         });
         $server->addMessageListener('location', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('location', $message, $next);
+            return event('plugin.wechat.message', event: 'location', message: $message, closure: $next);
         });
         $server->addMessageListener('link', function ($message, \Closure $next) {
-            return $this->dispatchMessageEvent('link', $message, $next);
+            return event('plugin.wechat.message', event: 'link', message: $message, closure: $next);
         });
-
+        $server->addMessageListener('voice', function ($message, \Closure $next) {
+            return event('plugin.wechat.message', event: 'voice', message: $message, closure: $next);
+        });
         return $server->serve();
-    }
-
-    protected function dispatchMessageEvent(string $eventName, $message, \Closure $next)
-    {
-        return event('plugin.wechat.message', $eventName, $message, $next);
     }
 
     /**
@@ -177,7 +171,6 @@ class MiniProgram
             'code' => $code,
         ];
         $result = $client->postJson('wxa/business/getuserphonenumber', $data);
-
         return $result->toArray(true);
     }
 }
